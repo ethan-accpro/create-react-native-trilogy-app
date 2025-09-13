@@ -1,7 +1,10 @@
 {
-  "name": "onboardingapp",
-  "version": "0.0.1",
+  "name": "create-react-native-trilogy",
+  "version": "1.0.0",
   "private": true,
+  "bin": {
+    "create-trilogy-app": "index.js"
+  },
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
