@@ -21,7 +21,7 @@
     "react-dom": "^18.0.0",
     "react-native": "0.76.3",
     "react-native-linear-gradient": "^2.8.3",
-    "react-native-svg": "^15.8.0",
+    "react-native-svg": "15.8.0",
     "tslib": "^2.4.0"
   },
   "devDependencies": {
