@@ -26,6 +26,12 @@ variant_for_slice()
   "hermes.xcframework/ios-arm64_x86_64-simulator")
     echo "simulator"
     ;;
+  "hermes.xcframework/tvos-arm64")
+    echo ""
+    ;;
+  "hermes.xcframework/tvos-arm64_x86_64-simulator")
+    echo "simulator"
+    ;;
   "hermes.xcframework/xros-arm64")
     echo ""
     ;;
@@ -45,6 +51,12 @@ archs_for_slice()
     echo "arm64 x86_64"
     ;;
   "hermes.xcframework/ios-arm64_x86_64-simulator")
+    echo "arm64 x86_64"
+    ;;
+  "hermes.xcframework/tvos-arm64")
+    echo "arm64"
+    ;;
+  "hermes.xcframework/tvos-arm64_x86_64-simulator")
     echo "arm64 x86_64"
     ;;
   "hermes.xcframework/xros-arm64")

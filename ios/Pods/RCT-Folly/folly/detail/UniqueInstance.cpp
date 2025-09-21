@@ -17,6 +17,7 @@
 #include <folly/detail/UniqueInstance.h>
 
 #include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -29,6 +30,16 @@ namespace folly {
 namespace detail {
 
 namespace {
+
+bool equal(std::type_info const& a, std::type_info const& b) {
+  if (kIsLibcpp) {
+    auto const an = a.name();
+    auto const bn = b.name();
+    return &a == &b || an == bn || 0 == std::strcmp(an, bn);
+  }
+
+  return a == b;
+}
 
 using Ptr = std::type_info const*;
 struct PtrRange {
@@ -49,8 +60,20 @@ PtrRange ptr_range_mapped(Value value) {
 }
 
 bool equal(PtrRange lhs, PtrRange rhs) {
-  auto const cmp = [](auto a, auto b) { return *a == *b; };
+  auto const cmp = [](auto a, auto b) { return equal(*a, *b); };
   return std::equal(lhs.b, lhs.e, rhs.b, rhs.e, cmp);
+}
+
+std::string_view parse_demangled_tag_name(std::string_view str) {
+  auto off = std::string_view::npos;
+  // strip surrounding `folly::tag<{...}>`
+  off = str.find('<');
+  str = str.substr(off + 1, str.size() - off - 2);
+  // strip trailing spaces, if any
+  off = str.find_last_not_of(' ');
+  str = str.substr(0, off == std::string_view::npos ? off : off + 1);
+  // done
+  return str;
 }
 
 std::string join(PtrRange types) {
@@ -59,16 +82,14 @@ std::string join(PtrRange types) {
     if (t != types.b) {
       ret << ", ";
     }
-    ret << demangle((*t)->name());
+    ret << parse_demangled_tag_name(demangle((*t)->name()));
   }
   return ret.str();
 }
 
 template <typename Value>
 fbstring render_tmpl(Value value) {
-  auto const str = demangle(value.tmpl->name());
-  auto const off = str.find('<');
-  return str.substr(off + 1, str.size() - off - 2);
+  return fbstring(parse_demangled_tag_name(demangle(value.tmpl->name())));
 }
 
 template <typename Value>
@@ -91,7 +112,7 @@ void UniqueInstance::enforce(Arg& arg) noexcept {
     global = local;
     return;
   }
-  if (*global.tmpl != *local.tmpl) {
+  if (!equal(*global.tmpl, *local.tmpl)) {
     throw_exception<std::logic_error>("mismatched unique instance");
   }
   if (!equal(ptr_range_key(global), ptr_range_key(local))) {

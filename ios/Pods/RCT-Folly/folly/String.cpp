@@ -220,7 +220,9 @@ void stringAppendfImpl(std::string& output, const char* format, va_list args) {
 std::string stringPrintf(const char* format, ...) {
   va_list ap;
   va_start(ap, format);
-  SCOPE_EXIT { va_end(ap); };
+  SCOPE_EXIT {
+    va_end(ap);
+  };
   return stringVPrintf(format, ap);
 }
 
@@ -235,7 +237,9 @@ std::string stringVPrintf(const char* format, va_list ap) {
 std::string& stringAppendf(std::string* output, const char* format, ...) {
   va_list ap;
   va_start(ap, format);
-  SCOPE_EXIT { va_end(ap); };
+  SCOPE_EXIT {
+    va_end(ap);
+  };
   return stringVAppendf(output, format, ap);
 }
 
@@ -248,7 +252,9 @@ std::string& stringVAppendf(
 void stringPrintf(std::string* output, const char* format, ...) {
   va_list ap;
   va_start(ap, format);
-  SCOPE_EXIT { va_end(ap); };
+  SCOPE_EXIT {
+    va_end(ap);
+  };
   return stringVPrintf(output, format, ap);
 }
 
@@ -461,8 +467,7 @@ std::string hexDump(const void* ptr, size_t size) {
 // `strerror_r` to `invoke_strerror_r` function, and C++ compiler
 // selects proper function.
 
-FOLLY_MAYBE_UNUSED
-static std::string invoke_strerror_r(
+[[maybe_unused]] static std::string invoke_strerror_r(
     int (*strerror_r)(int, char*, size_t), int err, char* buf, size_t buflen) {
   // Using XSI-compatible strerror_r
   int r = strerror_r(err, buf, buflen);
@@ -476,8 +481,7 @@ static std::string invoke_strerror_r(
   }
 }
 
-FOLLY_MAYBE_UNUSED
-static std::string invoke_strerror_r(
+[[maybe_unused]] static std::string invoke_strerror_r(
     char* (*strerror_r)(int, char*, size_t),
     int err,
     char* buf,
